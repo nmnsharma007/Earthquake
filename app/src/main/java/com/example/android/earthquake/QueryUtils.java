@@ -21,6 +21,15 @@ import java.util.ArrayList;
 import java.util.Date;
 
 /**
+ * features to add:
+ * order by
+ * min magnitude
+ * max magnitude
+ * end time
+ * start time
+ */
+
+/**
  * Helper methods related to requesting and receiving earthquake data from USGS.
  */
 public final class QueryUtils {
@@ -86,6 +95,7 @@ public final class QueryUtils {
             urlConnection.setConnectTimeout(15000/*milliseconds*/);
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();
+            Log.v(LOG_TAG,"Network request made");
 
             // if the request was successful(response code 200)
             //then read the input stream and parse the output

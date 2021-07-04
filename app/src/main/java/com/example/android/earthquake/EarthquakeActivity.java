@@ -52,16 +52,22 @@ public class EarthquakeActivity extends AppCompatActivity {
         // find a reference to the {@link RecyclerView} in the layout
         mRecyclerView = findViewById(R.id.earthquakes);
         mConnectivityManager = getSystemService(ConnectivityManager.class);
-        mEmptyView.setText("No internet available");
-        mEmptyView.setVisibility(View.VISIBLE);
+        if(mConnectivityManager.getActiveNetwork() == null && mMyModel.getEarthquakes() == null) {
+            mEmptyView.setText("No internet available");
+            mEmptyView.setVisibility(View.VISIBLE);
+        }
+        else{
+            mProgressBar.setVisibility(View.VISIBLE);
+            fetchData();
+        }
         Handler handler = new Handler(Looper.getMainLooper());
+        // setup network listener for when some network connection gets active
         mConnectivityManager.registerDefaultNetworkCallback(new ConnectivityManager.NetworkCallback(){
             @Override
             public void onAvailable(Network network) {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        fetchData();
                         mEmptyView.setVisibility(View.GONE);
                         mProgressBar.setVisibility(View.VISIBLE);
                         fetchData();
@@ -74,9 +80,10 @@ public class EarthquakeActivity extends AppCompatActivity {
 
     private void fetchData(){
         // fetch the list of earthquakes
-        mMyModel.getEarthquakes().observe(EarthquakeActivity.this, new Observer<ArrayList<Earthquake>>() {
+        mMyModel.getmMutableLiveData().observe(EarthquakeActivity.this, new Observer<ArrayList<Earthquake>>() {
             @Override
             public void onChanged(ArrayList<Earthquake> earthquakes) {
+                Log.v(LOG_TAG,"fetching the data");
                 // set up recycler view with this data, this will work even if you rotate the device
                 setUpRecyclerView(earthquakes);
             }

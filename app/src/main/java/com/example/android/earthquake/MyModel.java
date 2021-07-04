@@ -12,13 +12,14 @@ import java.util.concurrent.Executors;
 public class MyModel extends ViewModel {
 
     private static final String LOG_TAG = "MyModel";
-    public MutableLiveData<ArrayList<Earthquake>> mMutableLiveData;
-    public ArrayList<Earthquake> mEarthquakes;
+    private MutableLiveData<ArrayList<Earthquake>> mMutableLiveData;
 
-    public MutableLiveData<ArrayList<Earthquake>> getEarthquakes() {
-        mMutableLiveData = new MutableLiveData<>();
-        // call the API
-        init();
+    public MutableLiveData<ArrayList<Earthquake>> getmMutableLiveData() {
+        if(mMutableLiveData == null) {
+            // call the API
+            mMutableLiveData = new MutableLiveData<>();
+            init();
+        }
         return mMutableLiveData;
     }
 
@@ -29,13 +30,21 @@ public class MyModel extends ViewModel {
             @Override
             public void run() {
                 // create array list of earthquakes
-                mEarthquakes = QueryUtils.fetchEarthquakeData("https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2021-06-01&limit=300");
-                mMutableLiveData.postValue(mEarthquakes);
+                mMutableLiveData.postValue(QueryUtils.fetchEarthquakeData("https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2021-06-01&limit=300"));
             }
         });
         executorService.shutdown();
 
     }
 
+    // fetching the earthquakes mutable list without calling the init method
+    public MutableLiveData<ArrayList<Earthquake>> getEarthquakes() {
+        if(mMutableLiveData == null) {
+            Log.v(LOG_TAG,"The mutable list is null");
+        }
+        return mMutableLiveData;
+    }
+
 
 }//https://blog.mindorks.com/understanding-livedata-in-android
+// https://tudip.com/blog-post/livedata-android/
