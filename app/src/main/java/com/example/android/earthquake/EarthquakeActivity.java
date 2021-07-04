@@ -1,5 +1,6 @@
 package com.example.android.earthquake;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
@@ -19,9 +20,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import androidx.appcompat.widget.Toolbar;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -42,6 +47,9 @@ public class EarthquakeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
+        // Find the toolbar view inside the activity layout
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         mEmptyView = findViewById(R.id.empty_view);
         // get the progress bar to indicate loading
         mProgressBar = findViewById(R.id.loading_bar);
@@ -76,6 +84,14 @@ public class EarthquakeActivity extends AppCompatActivity {
             }
         });
         Log.e(LOG_TAG,"Visibility changed");
+    }
+
+    // inflating the options menu to show settings
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main,menu);
+        return true;
     }
 
     private void fetchData(){
@@ -113,6 +129,12 @@ public class EarthquakeActivity extends AppCompatActivity {
         }
     }
 
+    // for handling selection from the options menu
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+    }
+
     private void searchWeb(String url) {
         Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
         intent.putExtra(SearchManager.QUERY,url);
@@ -123,3 +145,5 @@ public class EarthquakeActivity extends AppCompatActivity {
 }
 
 //https://guides.codepath.com/android/using-the-recyclerview
+// https://guides.codepath.com/android/Storing-and-Accessing-SharedPreferences
+// https://guides.codepath.com/android/using-the-app-toolbar
