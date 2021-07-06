@@ -11,6 +11,7 @@ import android.app.SearchManager;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
@@ -24,6 +25,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.appcompat.widget.Toolbar;
@@ -42,6 +44,10 @@ public class EarthquakeActivity extends AppCompatActivity {
     private EarthquakeAdapter mEarthquakeAdapter;
     private ProgressBar mProgressBar;
     private ConnectivityManager mConnectivityManager;
+    private int minMag;
+    private int maxMag;
+    private String orderBy;
+    private Handler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +63,17 @@ public class EarthquakeActivity extends AppCompatActivity {
         mViewModelProvider = new ViewModelProvider(this);
         // get the view model for the class
         mMyModel = mViewModelProvider.get(MyModel.class);
+        minMag = 0;
+        maxMag = 10;
+        orderBy = "time";
+        // get the shared preferences file
+        SharedPreferences preferences = getSharedPreferences("preferences",Context.MODE_PRIVATE);
+        // reading from shared preferences
+        minMag = preferences.getInt("Minimum Magnitude",0);
+        maxMag = preferences.getInt("Maximum Magnitude",0);
+        orderBy = preferences.getString("orderBy","Descending Time");
+        // generate the parameter corresponding to the order chosen
+        orderBy = findValue(orderBy);
         // find a reference to the {@link RecyclerView} in the layout
         mRecyclerView = findViewById(R.id.earthquakes);
         mConnectivityManager = getSystemService(ConnectivityManager.class);
@@ -68,12 +85,17 @@ public class EarthquakeActivity extends AppCompatActivity {
             mProgressBar.setVisibility(View.VISIBLE);
             fetchData();
         }
-        Handler handler = new Handler(Looper.getMainLooper());
+        mHandler = new Handler(Looper.getMainLooper());
+        fetchEarthquakes();
+        Log.e(LOG_TAG,"Visibility changed");
+    }
+
+    public void fetchEarthquakes() {
         // setup network listener for when some network connection gets active
         mConnectivityManager.registerDefaultNetworkCallback(new ConnectivityManager.NetworkCallback(){
             @Override
             public void onAvailable(Network network) {
-                handler.post(new Runnable() {
+                mHandler.post(new Runnable() {
                     @Override
                     public void run() {
                         mEmptyView.setVisibility(View.GONE);
@@ -83,7 +105,6 @@ public class EarthquakeActivity extends AppCompatActivity {
                 });
             }
         });
-        Log.e(LOG_TAG,"Visibility changed");
     }
 
     // inflating the options menu to show settings
@@ -96,7 +117,7 @@ public class EarthquakeActivity extends AppCompatActivity {
 
     private void fetchData(){
         // fetch the list of earthquakes
-        mMyModel.getmMutableLiveData().observe(EarthquakeActivity.this, new Observer<ArrayList<Earthquake>>() {
+        mMyModel.getMutableLiveData(minMag,maxMag,orderBy).observe(EarthquakeActivity.this, new Observer<ArrayList<Earthquake>>() {
             @Override
             public void onChanged(ArrayList<Earthquake> earthquakes) {
                 Log.v(LOG_TAG,"fetching the data");
@@ -132,7 +153,9 @@ public class EarthquakeActivity extends AppCompatActivity {
     // for handling selection from the options menu
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
+        Intent intent = new Intent(EarthquakeActivity.this,SettingsActivity.class);
+        startActivity(intent);
+        return true;
     }
 
     private void searchWeb(String url) {
@@ -141,6 +164,20 @@ public class EarthquakeActivity extends AppCompatActivity {
         if(intent.resolveActivity(getPackageManager()) != null) {
             startActivity(intent);
         }
+    }
+
+    private String findValue(String orderBy) {
+        switch (orderBy) {
+            case "Descending Time":
+                return "time";
+            case "Ascending Time":
+                return "time-asc";
+            case "Ascending Magnitude":
+                return "magnitude-asc";
+            case "Descending Magnitude":
+                return "magnitude";
+        }
+        return "time";
     }
 }
 

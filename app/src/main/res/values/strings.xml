@@ -13,6 +13,12 @@
      limitations under the License.
 -->
 <resources>
+    <string-array name="orderBy">
+        <item>Descending Time</item>
+        <item>Ascending Time</item>
+        <item>Descending Magnitude</item>
+        <item>Ascending Magnitude</item>
+    </string-array>
     <string name="app_name">Quake Report</string>
     <string name="no_data_available">No Earthquakes Available</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -32,4 +38,11 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="preference">Change your preferences</string>
+    <string name="minMagText">Minimum Magnitude</string>
+    <string name="decrement">-</string>
+    <string name="increment">+</string>
+    <string name="defaultMag">1</string>
+    <string name="maxMagText">Maximum Magnitude</string>
+    <string name="settingsFile">com.example.earthquake.preferenceFile</string>
 </resources>
