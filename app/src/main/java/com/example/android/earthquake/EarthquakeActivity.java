@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.app.SearchManager;
@@ -34,8 +35,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class EarthquakeActivity extends AppCompatActivity {
-
+public class EarthquakeActivity extends AppCompatActivity{
     private static final String LOG_TAG = "MainActivity";
     private MyModel mMyModel;
     private ViewModelProvider mViewModelProvider;
@@ -48,14 +48,20 @@ public class EarthquakeActivity extends AppCompatActivity {
     private int maxMag;
     private String orderBy;
     private Handler mHandler;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
+        // get the shared preferences file
+        sharedPreferences = this.getSharedPreferences(getString(R.string.settingsFile),Context.MODE_PRIVATE);
         // Find the toolbar view inside the activity layout
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        minMag = -1;
+        maxMag = -1;
+        orderBy = "random";// random string to trigger fetching of data on creation of activity
         mEmptyView = findViewById(R.id.empty_view);
         // get the progress bar to indicate loading
         mProgressBar = findViewById(R.id.loading_bar);
@@ -63,19 +69,40 @@ public class EarthquakeActivity extends AppCompatActivity {
         mViewModelProvider = new ViewModelProvider(this);
         // get the view model for the class
         mMyModel = mViewModelProvider.get(MyModel.class);
-        minMag = 0;
-        maxMag = 10;
-        orderBy = "time";
-        // get the shared preferences file
-        SharedPreferences preferences = getSharedPreferences("preferences",Context.MODE_PRIVATE);
-        // reading from shared preferences
-        minMag = preferences.getInt("Minimum Magnitude",0);
-        maxMag = preferences.getInt("Maximum Magnitude",0);
-        orderBy = preferences.getString("orderBy","Descending Time");
-        // generate the parameter corresponding to the order chosen
-        orderBy = findValue(orderBy);
         // find a reference to the {@link RecyclerView} in the layout
         mRecyclerView = findViewById(R.id.earthquakes);
+    }
+
+    /**
+     * checking if preferences were updated whenever activity is resumed, if yes
+     * make a new network request based on updated preferences
+     */
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // reading from shared preferences
+        int tempMinMag = sharedPreferences.getInt(getString(R.string.minimumMagnitude),0);
+        int tempMaxMag = sharedPreferences.getInt(getString(R.string.maximumMagnitude),0);
+        String tempOrderBy = sharedPreferences.getString(getString(R.string.orderBy),"Descending Time");
+        if(tempMaxMag != maxMag || tempMinMag != minMag || !tempOrderBy.equals(orderBy)){
+            minMag = tempMinMag;
+            maxMag = tempMaxMag;
+            orderBy = tempOrderBy;
+            // generate the parameter corresponding to the order chosen
+            orderBy = findValue(orderBy);
+            mMyModel.nullifyMutableLiveData();
+            mRecyclerView.setVisibility(View.GONE);
+            init();
+        }
+    }
+
+    /**
+     * check if internet connection is available to , if yes make an API call else
+     * tell the user about the missing internet connectivity
+     */
+
+    private void init() {
         mConnectivityManager = getSystemService(ConnectivityManager.class);
         if(mConnectivityManager.getActiveNetwork() == null && mMyModel.getEarthquakes() == null) {
             mEmptyView.setText("No internet available");
@@ -87,11 +114,13 @@ public class EarthquakeActivity extends AppCompatActivity {
         }
         mHandler = new Handler(Looper.getMainLooper());
         fetchEarthquakes();
-        Log.e(LOG_TAG,"Visibility changed");
     }
 
+    /**
+     * setup network listener for when some network connection gets active and if network connection
+     * is available, make a request
+     */
     public void fetchEarthquakes() {
-        // setup network listener for when some network connection gets active
         mConnectivityManager.registerDefaultNetworkCallback(new ConnectivityManager.NetworkCallback(){
             @Override
             public void onAvailable(Network network) {
@@ -107,7 +136,9 @@ public class EarthquakeActivity extends AppCompatActivity {
         });
     }
 
-    // inflating the options menu to show settings
+    /**
+     * inflating the options menu to show settings
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -115,17 +146,24 @@ public class EarthquakeActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * fetch the list of earthquakes and observe the changes in the data and screen configuration
+     * set up recycler view with this data, this will work even if the device is rotated
+     */
     private void fetchData(){
-        // fetch the list of earthquakes
         mMyModel.getMutableLiveData(minMag,maxMag,orderBy).observe(EarthquakeActivity.this, new Observer<ArrayList<Earthquake>>() {
             @Override
             public void onChanged(ArrayList<Earthquake> earthquakes) {
                 Log.v(LOG_TAG,"fetching the data");
-                // set up recycler view with this data, this will work even if you rotate the device
                 setUpRecyclerView(earthquakes);
             }
         });
     }
+
+    /**
+     * setup the the recycler view with the list or tell the user if no matching earthquakes were
+     * found
+     */
 
     private void setUpRecyclerView(ArrayList<Earthquake> earthquakes) {
         if(earthquakes == null || earthquakes.size() == 0) {
@@ -150,13 +188,20 @@ public class EarthquakeActivity extends AppCompatActivity {
         }
     }
 
-    // for handling selection from the options menu
+    /**
+     * for handling selection from the options menu
+     */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         Intent intent = new Intent(EarthquakeActivity.this,SettingsActivity.class);
         startActivity(intent);
         return true;
     }
+
+    /**
+     * if user clicks an earthquake on screen, direct him to the website for more information on
+     * that earthquake
+     */
 
     private void searchWeb(String url) {
         Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
@@ -166,6 +211,10 @@ public class EarthquakeActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * helper function to get the string corresponding to the user preference in spinner object so
+     * that suitable network request can be made
+     */
     private String findValue(String orderBy) {
         switch (orderBy) {
             case "Descending Time":
@@ -181,6 +230,3 @@ public class EarthquakeActivity extends AppCompatActivity {
     }
 }
 
-//https://guides.codepath.com/android/using-the-recyclerview
-// https://guides.codepath.com/android/Storing-and-Accessing-SharedPreferences
-// https://guides.codepath.com/android/using-the-app-toolbar
