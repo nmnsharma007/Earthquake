@@ -2,13 +2,13 @@
 
 <resources>
     <!-- Primary color of the app (shown in the app bar) -->
-    <color name="colorPrimary">#2B3D4D</color>
+    <color name="colorPrimary">#A500FF</color>
 
     <!-- Primary dark color of the app (shown in the status bar) -->
-    <color name="colorPrimaryDark">#23303D</color>
+    <color name="colorPrimaryDark">#700CB3</color>
 
     <!-- Accent color of the app -->
-    <color name="colorAccent">#10CAC9</color>
+    <color name="colorAccent">#C800C8</color>
     <!-- Color for an earthquake with magnitude 0 and 2 -->
     <color name="magnitude1">#4A7BA7</color>
 

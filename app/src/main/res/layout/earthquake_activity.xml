@@ -7,12 +7,12 @@
     android:layout_height="match_parent">
 
     <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_main"
+
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:elevation="4dp"
-        android:id="@+id/toolbar"
-        android:background="?attr/colorPrimary"
-        />
+        android:background="@color/colorPrimary"
+        android:elevation="4dp" />
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/earthquakes"
         android:layout_width="match_parent"

@@ -140,6 +140,7 @@ public final class QueryUtils {
             JSONObject jsonObject = new JSONObject(jsonResponse);
             // get the features array from the json object
             JSONArray jsonArray = jsonObject.getJSONArray("features");
+            Log.v(LOG_TAG,"Size of data: " + jsonArray.length());
             for(int i = 0; i < jsonArray.length();++i) {
                 // build up a list of Earthquake objects with the corresponding data.
                 JSONObject jsonObject1 = jsonArray.getJSONObject(i);

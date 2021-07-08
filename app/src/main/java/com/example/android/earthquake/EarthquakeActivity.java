@@ -13,6 +13,7 @@ import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
@@ -59,8 +60,9 @@ public class EarthquakeActivity extends AppCompatActivity{
         sharedPreferences = this.getSharedPreferences(
                 getString(R.string.settingsFile),Context.MODE_PRIVATE);
         // Find the toolbar view inside the activity layout
-        mToolbar = findViewById(R.id.toolbar);
+        mToolbar = findViewById(R.id.toolbar_main);
         setSupportActionBar(mToolbar);
+        mToolbar.setTitleTextColor(Color.WHITE);
         minMag = -1;
         maxMag = -1;
         orderBy = "random";// random string to trigger fetching of data on creation of activity
@@ -141,7 +143,6 @@ public class EarthquakeActivity extends AppCompatActivity{
                 new Observer<ArrayList<Earthquake>>() {
                     @Override
                     public void onChanged(ArrayList<Earthquake> earthquakes) {
-                        Log.v(LOG_TAG,"fetching the data");
                         setUpRecyclerView(earthquakes);
                     }
                 });
@@ -179,7 +180,6 @@ public class EarthquakeActivity extends AppCompatActivity{
             mRecyclerView.setAdapter(mEarthquakeAdapter);
             // set the layout manager to position the items
             mRecyclerView.setLayoutManager(new LinearLayoutManager(EarthquakeActivity.this));
-            Log.e(LOG_TAG,"Recycler view about to be setup");
             // click listener for when an item is clicked
             mEarthquakeAdapter.setClickListener((view, position) ->
                     searchWeb(earthquakes.get(position).getUrl()));

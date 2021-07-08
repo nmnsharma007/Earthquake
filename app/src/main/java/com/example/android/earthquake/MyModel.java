@@ -36,9 +36,7 @@ public class MyModel extends ViewModel {
             @Override
             public void run() {
                 // create array list of earthquakes
-                String url = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minmagnitude="+minMag+ "&maxmagnitude="+maxMag+"&limit=300&orderby="+orderBy;
-                Log.v(LOG_TAG,url);
-                mMutableLiveData.postValue(QueryUtils.fetchEarthquakeData("https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minmagnitude="+minMag+ "&maxmagnitude="+maxMag+"&limit=300&orderby="+orderBy));
+                mMutableLiveData.postValue(QueryUtils.fetchEarthquakeData("https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minmagnitude="+minMag+ "&maxmagnitude="+maxMag+"&limit=3000&orderby="+orderBy));
             }
         });
         executorService.shutdown();
@@ -49,9 +47,6 @@ public class MyModel extends ViewModel {
      * fetching the earthquakes mutable list without calling the init method
      */
     public MutableLiveData<ArrayList<Earthquake>> getEarthquakes() {
-        if(mMutableLiveData == null) {
-            Log.v(LOG_TAG,"The mutable list is null");
-        }
         return mMutableLiveData;
     }
 
