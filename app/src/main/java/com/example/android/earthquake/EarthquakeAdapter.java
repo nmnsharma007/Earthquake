@@ -18,8 +18,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import android.graphics.drawable.GradientDrawable;
 
-// Create the basic adapter extending from RecyclerView.Adapter
-// we specify the custom ViewHolder which gives us access to our views
+/**
+ *  Create the basic adapter extending from RecyclerView.Adapter
+ *  we specify the custom ViewHolder which gives us access to our views
+ */
 public class EarthquakeAdapter extends RecyclerView.Adapter<EarthquakeAdapter.ViewHolder> {
 
     // store a member variable for the earthquakes
@@ -32,8 +34,8 @@ public class EarthquakeAdapter extends RecyclerView.Adapter<EarthquakeAdapter.Vi
         mEarthquakes = earthquakes;
         mContext = context;
     }
-    /*
-    Return the formatted date string from a date object
+    /**
+    * Return the formatted date string from a date object
      */
 
     private String formatDate(Date dateObj) {
@@ -41,8 +43,8 @@ public class EarthquakeAdapter extends RecyclerView.Adapter<EarthquakeAdapter.Vi
         return  simpleDateFormat.format(dateObj);
     }
 
-    /*
-    Return the formatted time string from a date object
+    /**
+    * Return the formatted time string from a date object
      */
     private String formatTime(Date dateObj) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("h:mm a");
@@ -60,6 +62,9 @@ public class EarthquakeAdapter extends RecyclerView.Adapter<EarthquakeAdapter.Vi
         }
     }
 
+    /**
+     * get the primary location name for the fetched location information
+     */
 
     private String primaryLocation(String location) {
         // finding the length of the string
@@ -74,7 +79,9 @@ public class EarthquakeAdapter extends RecyclerView.Adapter<EarthquakeAdapter.Vi
         }
     }
 
-    // get the color for the magnitude
+    /**
+     * get the color of the circle based on the magnitude
+     */
     private int getMagnitudeColor(double magnitude) {
         if(magnitude <= 2){
             return ContextCompat.getColor(mContext,R.color.magnitude1);
@@ -106,6 +113,9 @@ public class EarthquakeAdapter extends RecyclerView.Adapter<EarthquakeAdapter.Vi
         return ContextCompat.getColor(mContext,R.color.magnitude10plus);
     }
 
+    /**
+     * override the needed methods for our custom adapter to work properly
+     */
     @Override
     public EarthquakeAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // Create a new view, which defines the UI of the list item
@@ -155,12 +165,17 @@ public class EarthquakeAdapter extends RecyclerView.Adapter<EarthquakeAdapter.Vi
 
     }
 
-    // Returns the total count of items in the array list
+    /**
+     * Returns the total count of items in the array list
+     */
     @Override
     public int getItemCount() {
         return mEarthquakes.size();
     }
 
+    /**
+     * setup a click listener for the recycler view
+     */
     public void setClickListener(ItemClickListener itemClickListener) {
         this.clickListener = itemClickListener;
     }
@@ -174,8 +189,11 @@ public class EarthquakeAdapter extends RecyclerView.Adapter<EarthquakeAdapter.Vi
         private TextView locationTextView;
         private TextView dateTextView;
         private TextView timeTextView;
-        //create a constructor that accepts entire list_item
-        // and does the view lookup to find each subview
+
+        /**
+         * create a constructor that accepts entire list_item
+         *          and does the view lookup to find each subview
+         */
         public ViewHolder(View itemView) {
             // stores the itemView in a public final member variable that can be used
             // to access the context from any ViewHolder instance
@@ -197,10 +215,4 @@ public class EarthquakeAdapter extends RecyclerView.Adapter<EarthquakeAdapter.Vi
     }
 }
 
-/*
-The Activity class will implement an interface for onClick event,
-this interface will be passed to the RecyclerView Adapter class,
-then the ViewHolder class in the RecyclerView will call onClick
-method defined in the interface, which will pass the view and position of the clicked item in the Activity class
-https://www.codexpedia.com/android/defining-item-click-listener-for-recyclerview-in-android/
- */
+

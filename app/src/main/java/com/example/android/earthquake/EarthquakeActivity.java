@@ -49,6 +49,7 @@ public class EarthquakeActivity extends AppCompatActivity{
     private String orderBy;
     private Handler mHandler;
     private SharedPreferences sharedPreferences;
+    private Toolbar mToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,8 +58,8 @@ public class EarthquakeActivity extends AppCompatActivity{
         // get the shared preferences file
         sharedPreferences = this.getSharedPreferences(getString(R.string.settingsFile),Context.MODE_PRIVATE);
         // Find the toolbar view inside the activity layout
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mToolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
         minMag = -1;
         maxMag = -1;
         orderBy = "random";// random string to trigger fetching of data on creation of activity
@@ -69,8 +70,23 @@ public class EarthquakeActivity extends AppCompatActivity{
         mViewModelProvider = new ViewModelProvider(this);
         // get the view model for the class
         mMyModel = mViewModelProvider.get(MyModel.class);
-        // find a reference to the {@link RecyclerView} in the layout
+        // find a reference to the RecyclerView in the layout
         mRecyclerView = findViewById(R.id.earthquakes);
+        mHandler = new Handler(Looper.getMainLooper());
+        mConnectivityManager = getSystemService(ConnectivityManager.class);
+        mConnectivityManager.registerDefaultNetworkCallback(new ConnectivityManager.NetworkCallback(){
+            @Override
+            public void onAvailable(Network network) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mEmptyView.setVisibility(View.GONE);
+                        mProgressBar.setVisibility(View.VISIBLE);
+                        fetchData();
+                    }
+                });
+            }
+        });
     }
 
     /**
@@ -85,7 +101,7 @@ public class EarthquakeActivity extends AppCompatActivity{
         int tempMinMag = sharedPreferences.getInt(getString(R.string.minimumMagnitude),0);
         int tempMaxMag = sharedPreferences.getInt(getString(R.string.maximumMagnitude),0);
         String tempOrderBy = sharedPreferences.getString(getString(R.string.orderBy),"Descending Time");
-        if(tempMaxMag != maxMag || tempMinMag != minMag || !tempOrderBy.equals(orderBy)){
+        if(tempMaxMag != maxMag || tempMinMag != minMag || !findBack(orderBy).equals(tempOrderBy)){
             minMag = tempMinMag;
             maxMag = tempMaxMag;
             orderBy = tempOrderBy;
@@ -103,37 +119,29 @@ public class EarthquakeActivity extends AppCompatActivity{
      */
 
     private void init() {
-        mConnectivityManager = getSystemService(ConnectivityManager.class);
         if(mConnectivityManager.getActiveNetwork() == null && mMyModel.getEarthquakes() == null) {
-            mEmptyView.setText("No internet available");
+            mEmptyView.setText(R.string.no_internet);
             mEmptyView.setVisibility(View.VISIBLE);
         }
         else{
             mProgressBar.setVisibility(View.VISIBLE);
             fetchData();
         }
-        mHandler = new Handler(Looper.getMainLooper());
-        fetchEarthquakes();
     }
 
     /**
-     * setup network listener for when some network connection gets active and if network connection
-     * is available, make a request
+     * fetch the list of earthquakes and observe the changes in the data and screen configuration
+     * set up recycler view with this data, this will work even if the device is rotated
      */
-    public void fetchEarthquakes() {
-        mConnectivityManager.registerDefaultNetworkCallback(new ConnectivityManager.NetworkCallback(){
-            @Override
-            public void onAvailable(Network network) {
-                mHandler.post(new Runnable() {
+    private void fetchData(){
+        mMyModel.getMutableLiveData(minMag,maxMag,orderBy).observe(EarthquakeActivity.this,
+                new Observer<ArrayList<Earthquake>>() {
                     @Override
-                    public void run() {
-                        mEmptyView.setVisibility(View.GONE);
-                        mProgressBar.setVisibility(View.VISIBLE);
-                        fetchData();
+                    public void onChanged(ArrayList<Earthquake> earthquakes) {
+                        Log.v(LOG_TAG,"fetching the data");
+                        setUpRecyclerView(earthquakes);
                     }
                 });
-            }
-        });
     }
 
     /**
@@ -144,20 +152,6 @@ public class EarthquakeActivity extends AppCompatActivity{
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main,menu);
         return true;
-    }
-
-    /**
-     * fetch the list of earthquakes and observe the changes in the data and screen configuration
-     * set up recycler view with this data, this will work even if the device is rotated
-     */
-    private void fetchData(){
-        mMyModel.getMutableLiveData(minMag,maxMag,orderBy).observe(EarthquakeActivity.this, new Observer<ArrayList<Earthquake>>() {
-            @Override
-            public void onChanged(ArrayList<Earthquake> earthquakes) {
-                Log.v(LOG_TAG,"fetching the data");
-                setUpRecyclerView(earthquakes);
-            }
-        });
     }
 
     /**
@@ -227,6 +221,24 @@ public class EarthquakeActivity extends AppCompatActivity{
                 return "magnitude";
         }
         return "time";
+    }
+
+    /**
+     * helper function to get string corresponding to the url query parameter and convert it into
+     * string in spinner object
+     */
+    private String findBack(String temp) {
+        switch (temp) {
+            case "time":
+                return "Descending Time";
+            case "time-asc":
+                return "Ascending Time";
+            case "magnitude":
+                return "Descending Magnitude";
+            case "magnitude-asc":
+                return "Ascending Magnitude";
+        }
+        return "Descending Time";
     }
 }
 

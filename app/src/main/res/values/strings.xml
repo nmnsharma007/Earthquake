@@ -22,4 +22,5 @@
     <string name="minimumMagnitude">com.example.earthquake.MinimumMagnitude</string>
     <string name="maximumMagnitude">com.example.earthquake.MaximumMagnitude</string>
     <string name="orderBy">com.example.earthquake.OrderBy</string>
+    <string name="no_internet">No internet available</string>
 </resources>
