@@ -21,32 +21,22 @@ import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * features to add:
- * order by
- * min magnitude
- * max magnitude
- * end time
- * start time
- */
-
-/**
  * Helper methods related to requesting and receiving earthquake data from USGS.
  */
 public final class QueryUtils {
 
 
     public static final String LOG_TAG = "QueryUtils";
+
     /**
-     * Create a private constructor because no one should ever create a {@link QueryUtils} object.
-     * This class is only meant to hold static variables and methods, which can be accessed
-     * directly from the class name QueryUtils (and an object instance of QueryUtils is not needed).
+     * create a private constructor so that no instance of the class is created
      */
     private QueryUtils() {
 
     }
 
     /**
-     * Query the USGS dataset and return an Earthquake object to represent earthquake
+     * Query the USGS dataset and return an Earthquake object to represent an earthquake
      */
     public static ArrayList<Earthquake> fetchEarthquakeData(String requestUrl) {
         // create URL object
@@ -63,7 +53,7 @@ public final class QueryUtils {
     }
 
     /**
-     *  Returns new URL object from the given string URL
+     *  Return new URL object from the given string URL
      */
 
     public static URL createURL(String stringUrl) {
