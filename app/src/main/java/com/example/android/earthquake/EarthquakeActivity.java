@@ -56,7 +56,8 @@ public class EarthquakeActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
         // get the shared preferences file
-        sharedPreferences = this.getSharedPreferences(getString(R.string.settingsFile),Context.MODE_PRIVATE);
+        sharedPreferences = this.getSharedPreferences(
+                getString(R.string.settingsFile),Context.MODE_PRIVATE);
         // Find the toolbar view inside the activity layout
         mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
@@ -74,7 +75,8 @@ public class EarthquakeActivity extends AppCompatActivity{
         mRecyclerView = findViewById(R.id.earthquakes);
         mHandler = new Handler(Looper.getMainLooper());
         mConnectivityManager = getSystemService(ConnectivityManager.class);
-        mConnectivityManager.registerDefaultNetworkCallback(new ConnectivityManager.NetworkCallback(){
+        mConnectivityManager.registerDefaultNetworkCallback(
+                new ConnectivityManager.NetworkCallback(){
             @Override
             public void onAvailable(Network network) {
                 mHandler.post(new Runnable() {
@@ -100,7 +102,8 @@ public class EarthquakeActivity extends AppCompatActivity{
         // reading from shared preferences
         int tempMinMag = sharedPreferences.getInt(getString(R.string.minimumMagnitude),0);
         int tempMaxMag = sharedPreferences.getInt(getString(R.string.maximumMagnitude),0);
-        String tempOrderBy = sharedPreferences.getString(getString(R.string.orderBy),"Descending Time");
+        String tempOrderBy = sharedPreferences.
+                getString(getString(R.string.orderBy),"Descending Time");
         if(tempMaxMag != maxMag || tempMinMag != minMag || !findBack(orderBy).equals(tempOrderBy)){
             minMag = tempMinMag;
             maxMag = tempMaxMag;
@@ -178,7 +181,8 @@ public class EarthquakeActivity extends AppCompatActivity{
             mRecyclerView.setLayoutManager(new LinearLayoutManager(EarthquakeActivity.this));
             Log.e(LOG_TAG,"Recycler view about to be setup");
             // click listener for when an item is clicked
-            mEarthquakeAdapter.setClickListener((view, position) -> searchWeb(earthquakes.get(position).getUrl()));
+            mEarthquakeAdapter.setClickListener((view, position) ->
+                    searchWeb(earthquakes.get(position).getUrl()));
         }
     }
 
