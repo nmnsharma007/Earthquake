@@ -6,4 +6,4 @@ and the list of earthquakes is fetched. The app also has a settings activity thr
 can change their preferences on earthquakes to be displayed. The user can choose the minimum magnitude
 and maximum magnitude and also sort the earthquake information based on ascending magnitude, descending
 magnitude, ascending time and descending time. This information once set will be saved even after user
-closes the app and opens it again. The app makes the api call only when the user preferenes have changed.
+closes the app and opens it again. The app makes the api call only when the user preferences have changed.
