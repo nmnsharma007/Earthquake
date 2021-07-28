@@ -19,6 +19,6 @@ and maximum magnitude and also sort the earthquake information based on
 
 The app uses Shared Preferences to store this information
 and saves it even when the app is closed. The App also uses ViewModel so that network request is not made
-again when the device configuration changes like rotation of the screen. The App also uses LiveData to 
+again when the device configuration changes like rotation of the screen. It also uses LiveData to 
 track the changes in the internet connectivity or user preferences so that a new network request is 
 automatically made.
