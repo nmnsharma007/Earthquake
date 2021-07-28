@@ -1,5 +1,5 @@
-## Earthquake
-# Android App for fetching earthquake data.
+# Earthquake
+## Android App for fetching earthquake data.
 
 The App is made using Java language. It uses an earthquake api to fetch recent earthquake information
 and display it to the user using a recycler view.
